@@ -1,0 +1,52 @@
+@host = http://localhost:8089
+@user_id = 90720c6f-5fc0-412f-9d36-09310fdc0f9e
+
+###
+GET {{host}}/healthz HTTP/1.1
+content-type: application/json
+
+###
+# @name auth
+POST {{host}}/v1/login HTTP/1.1
+content-type: application/json
+
+{
+  "email": "test@gmail.com", 
+  "password": "00000000"
+}
+
+###
+POST {{host}}/v1/register HTTP/1.1
+content-type: application/json
+
+{
+  "email": "newtest1@gmail.com",
+  "password": "00000000",
+  "lastname": "test 1",
+  "firstname": "test 1"
+}
+
+###
+GET {{host}}/v1/users HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{auth.response.body.token}}
+
+###
+GET {{host}}/v1/users/{{user_id}} HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{auth.response.body.token}}
+
+###
+PUT {{host}}/v1/users/{{user_id}} HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{auth.response.body.token}}
+
+{
+  "lastname": "u test",
+  "firstname": "u test"
+}
+
+###
+DELETE {{host}}/v1/users/{{user_id}} HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{auth.response.body.token}}

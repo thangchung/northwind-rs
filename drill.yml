@@ -1,0 +1,17 @@
+concurrency: 1000
+base: 'http://localhost:8089'
+iterations: 10000
+rampup: 0
+
+plan:
+  - name: Health Check
+    request:
+      url: /healthz
+  
+  - name: Login
+    request:
+      url: /v1/login
+      method: POST
+      body: '{"email": "valentil@gmail.com", "password": "0000"}'
+      headers:
+        Content-Type: 'application/json'

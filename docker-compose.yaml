@@ -1,0 +1,40 @@
+version: "3.7"
+
+services:
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-postgres@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-root}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    volumes:
+       - pgadmin:/root/.pgadmin
+    ports:
+      - 8080:80
+    networks:
+      - mynetwork
+    restart: unless-stopped
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: root
+    volumes:
+       - postgres:/data/postgres
+    ports:
+      - 5432:5432
+    networks:
+      - mynetwork
+    restart: unless-stopped
+
+networks:
+  mynetwork:
+    name: mynetwork-network
+
+volumes:
+    postgres:
+    pgadmin:
