@@ -6,7 +6,6 @@ use actix_web::web;
 /// Defines Web's routes
 pub fn web(cfg: &mut web::ServiceConfig) {
     cfg.route("/healthz", web::get().to(handlers::web::health_check))
-        .route("/async-process", web::get().to(handlers::web::async_process))
         .route("/ws-client", web::get().to(handlers::ws::ws_client))
         .route("/ws-chat-client", web::get().to(handlers::ws::ws_chat_client))
         .route("/ws", web::get().to(handlers::ws::index))

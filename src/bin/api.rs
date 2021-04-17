@@ -1,5 +1,5 @@
-use actix_sqlx_boilerplate::config::Config;
-use actix_sqlx_boilerplate::run;
+use northwind_rs::config::Config;
+use northwind_rs::run;
 use color_eyre::Result;
 use sqlx::PgPool;
 
@@ -14,16 +14,15 @@ async fn main() -> Result<()> {
     // ------------------
     color_eyre::install()?;
 
-    // Initialisation du pool Postgres
+    // Initialization Postgres Pool
     // ----------------------------
     let db_pool = PgPool::connect(db_url).await?;
 
     // Runs migrations
     // ---------------
-    // TODO: Ne fonctionne pas bien, essayer lors du passage en 0.5
-    // if settings.database_auto_migration {
-    //     sqlx::migrate!("./migrations").run(&db_pool).await?;
-    // }
+    if settings.database_auto_migration {
+        sqlx::migrate!("./migrations").run(&db_pool).await?;
+    }
 
     run(settings, db_pool).await
 }

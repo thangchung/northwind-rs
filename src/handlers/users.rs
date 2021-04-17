@@ -9,7 +9,7 @@ use actix_web::{http::StatusCode, web, HttpResponse, Responder};
 use actix_web_validator::Json;
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 use futures::TryStreamExt;
-use sqlx::{Done, PgPool};
+use sqlx::{PgPool};
 use uuid::Uuid;
 
 // Route: POST "/v1/login"

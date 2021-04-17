@@ -2,7 +2,7 @@ use crate::models::user::{Login, User, UpdateUserModel};
 use chrono::Utc;
 use futures::stream::BoxStream;
 use sha2::{Digest, Sha512};
-use sqlx::postgres::{PgDone, PgRow};
+use sqlx::postgres::{PgRow, PgQueryResult};
 use sqlx::{PgPool, Row};
 use uuid::Uuid;
 
@@ -42,7 +42,7 @@ impl UserRepository {
     }
 
     /// Add a new user
-    pub async fn create(pool: &PgPool, user: &mut User) -> Result<PgDone, sqlx::Error> {
+    pub async fn create(pool: &PgPool, user: &mut User) -> Result<PgQueryResult, sqlx::Error> {
         user.password = format!("{:x}", Sha512::digest(&user.password.as_bytes()));
 
         sqlx::query!(
@@ -111,7 +111,7 @@ impl UserRepository {
     }
 
     /// Delete a user
-    pub async fn delete(pool: &PgPool, id: Uuid) -> Result<PgDone, sqlx::Error> {
+    pub async fn delete(pool: &PgPool, id: Uuid) -> Result<PgQueryResult, sqlx::Error> {
         sqlx::query!(
             r#"
                 UPDATE users
@@ -126,7 +126,7 @@ impl UserRepository {
     }
 
     /// Update a user
-    pub async fn update(pool: &PgPool, id: Uuid, user: &UpdateUserModel) -> Result<PgDone, sqlx::Error> {
+    pub async fn update(pool: &PgPool, id: Uuid, user: &UpdateUserModel) -> Result<PgQueryResult, sqlx::Error> {
         sqlx::query!(
             r#"
                 UPDATE users
