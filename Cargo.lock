@@ -380,43 +380,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "actix_sqlx_boilerplate"
-version = "0.1.0"
-dependencies = [
- "actix",
- "actix-cors",
- "actix-files",
- "actix-http",
- "actix-service",
- "actix-web",
- "actix-web-actors",
- "actix-web-prom",
- "actix-web-validator",
- "askama",
- "askama_actix",
- "bytes 0.5.6",
- "chrono",
- "color-eyre",
- "config",
- "derive_more",
- "dotenv",
- "env_logger",
- "eyre",
- "futures",
- "jsonwebtoken",
- "log",
- "rand 0.8.3",
- "reqwest",
- "serde 1.0.125",
- "serde_json",
- "sha2",
- "sqlx",
- "tokio",
- "uuid",
- "validator",
-]
-
-[[package]]
 name = "addr2line"
 version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1164,6 +1127,9 @@ name = "either"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
+dependencies = [
+ "serde 1.0.125",
+]
 
 [[package]]
 name = "encoding_rs"
@@ -1999,6 +1965,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "northwind-rs"
+version = "0.1.0"
+dependencies = [
+ "actix",
+ "actix-cors",
+ "actix-files",
+ "actix-http",
+ "actix-service",
+ "actix-web",
+ "actix-web-actors",
+ "actix-web-prom",
+ "actix-web-validator",
+ "askama",
+ "askama_actix",
+ "bytes 0.5.6",
+ "chrono",
+ "color-eyre",
+ "config",
+ "derive_more",
+ "dotenv",
+ "env_logger",
+ "eyre",
+ "futures",
+ "jsonwebtoken",
+ "log",
+ "rand 0.8.3",
+ "reqwest",
+ "serde 1.0.125",
+ "serde_json",
+ "sha2",
+ "sqlx",
+ "tokio",
+ "uuid",
+ "validator",
+]
+
+[[package]]
 name = "num-bigint"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2645,6 +2648,7 @@ version = "1.0.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "799e97dc9fdae36a5c8b8f2cae9ce2ee9fdce2058c57a93e6099d919fd982f79"
 dependencies = [
+ "indexmap",
  "itoa",
  "ryu",
  "serde 1.0.125",
@@ -2837,6 +2841,7 @@ dependencies = [
  "parking_lot",
  "percent-encoding",
  "rand 0.7.3",
+ "serde 1.0.125",
  "sha-1",
  "sha2",
  "smallvec",
@@ -2860,9 +2865,12 @@ dependencies = [
  "either",
  "futures",
  "heck",
+ "hex",
  "lazy_static",
  "proc-macro2",
  "quote",
+ "serde 1.0.125",
+ "serde_json",
  "sha2",
  "sqlx-core",
  "sqlx-rt",

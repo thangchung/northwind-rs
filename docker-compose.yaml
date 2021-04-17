@@ -31,6 +31,25 @@ services:
       - mynetwork
     restart: unless-stopped
 
+  northwindrs:
+    image: northwind-rs
+    environment:
+      ENVIRONMENT: production
+      SERVER_URL: 127.0.0.1
+      SERVER_PORT: 8089
+      SERVER_LOG_LEVEL: info
+      RUST_LOG: info
+      JWT_SECRET_KEY: mySecretKey
+      JWT_LIFETIME: 2
+      DATABASE_URL: postgresql://postgres:root@postgres:5432/postgres
+    ports:
+      - 8089:8089
+    networks:
+      - mynetwork
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
 networks:
   mynetwork:
     name: mynetwork-network

@@ -1,10 +1,10 @@
 [package]
-authors = ["Fabien Bellanger <valentil@gmail.com>"]
-description = "Actix-web - SQLx boilerplate"
+authors = ["Thang Chung <thangchung@ymail.com>"]
+description = "northwind-rs application"
 edition = "2018"
-name = "actix_sqlx_boilerplate"
+name = "northwind-rs"
 readme = "README.md"
-repository = "https://github.com/fabienbellanger/actix-sqlx-boilerplate"
+repository = "https://github.com/thangchung/northwind-rs"
 version = "0.1.0"
 # default-bin = "api"
 
@@ -44,7 +44,7 @@ reqwest = "0.10.8"
 serde = "1.0"
 serde_json = "1.0"
 sha2 = "0.9"
-sqlx = {version = "0.4.2", default-features = false, features = ["runtime-async-std-native-tls", "macros", "postgres", "uuid", "chrono", "migrate"]}
+sqlx = {version = "0.4.2", default-features = false, features = ["runtime-async-std-native-tls", "macros", "postgres", "uuid", "chrono", "migrate", "offline"]}
 tokio = {version = "0.2", features = ["time"]}
 uuid = {version = "0.8", features = ["serde", "v4"]}
 validator = "0.12.0"

@@ -1,0 +1,175 @@
+{
+  "db": "PostgreSQL",
+  "8edef8be30adfd182a2c7bb99a9ca56c5acaabe58885bc6c2e00c12a8df35808": {
+    "query": "\n                INSERT INTO users (id, lastname, firstname, email, password, created_at, updated_at, deleted_at)\n                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Timestamp",
+          "Timestamp",
+          "Timestamp"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "9dbce6ddecd2e420fdddd583a27628df1e5ad67236a86eafee6e72791b172d75": {
+    "query": "\n                SELECT * \n                FROM users \n                WHERE id = $1\n                    AND deleted_at IS NULL\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 1,
+          "name": "lastname",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "firstname",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "email",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "password",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "created_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 6,
+          "name": "updated_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 7,
+          "name": "deleted_at",
+          "type_info": "Timestamp"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ]
+    }
+  },
+  "a4c7c460860329c17be39006dcc271eba882d2cfb6cd27478d296c44bbc5008e": {
+    "query": "\n                UPDATE users\n                SET deleted_at = $1\n                WHERE id = $2\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Timestamp",
+          "Uuid"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "a7b3957fc35c472485e21ace704d9e68e13c3be93300755ee9f5072cdd9e693e": {
+    "query": "\n                SELECT * \n                FROM users \n                WHERE email = $1 AND\n                    password = $2 AND\n                    deleted_at IS NULL\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 1,
+          "name": "lastname",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "firstname",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "email",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "password",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "created_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 6,
+          "name": "updated_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 7,
+          "name": "deleted_at",
+          "type_info": "Timestamp"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ]
+    }
+  },
+  "d9a003c189674e4b3ca2036d08cb9788c9b72a913784adb7abce7230d69c67c3": {
+    "query": "\n                UPDATE users\n                SET lastname = $1, firstname = $2, updated_at = $3\n                WHERE id = $4\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Varchar",
+          "Timestamp",
+          "Uuid"
+        ]
+      },
+      "nullable": []
+    }
+  }
+}
