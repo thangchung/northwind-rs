@@ -35,15 +35,17 @@ services:
   #   image: vietnamdevsgroup/northwind-rs:latest
   #   environment:
   #     ENVIRONMENT: production
-  #     SERVER_URL: 127.0.0.1
+  #     SERVER_URL: 0.0.0.0
   #     SERVER_PORT: 8089
   #     SERVER_LOG_LEVEL: info
   #     RUST_LOG: info
   #     JWT_SECRET_KEY: mySecretKey
   #     JWT_LIFETIME: 2
   #     DATABASE_URL: postgresql://postgres:root@postgres:5432/postgres
+  #     DATABASE_AUTO_MIGRATION: "true"
   #   ports:
   #     - 8089:8089
+  #   entrypoint: ["/layers/paketo-community_cargo-install/rust-bin/bin/api"]
   #   networks:
   #     - mynetwork
   #   restart: unless-stopped

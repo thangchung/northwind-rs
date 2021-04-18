@@ -8,26 +8,21 @@ Generated from [`actix-sqlx-boilerplate`](https://github.com/fabienbellanger/act
 
 If you're using this repository for your samples, workshop, your project or whatever, please give a star ⭐. Thank you very much :+1:
 
-## Up and running
+# Up and running
 
-### Run server
+## Run server
 
 ```bash
 $ docker-compose up
-```
-
-```bash
-$ sqlx migrate run
-```
-
-```bash
 $ cargo run --bin api
 ```
 
-### SQLx
+Then play around with `restclient.http`
+
+# SQLx
 
 sqlx repository: [Github](https://github.com/launchbadge/sqlx)
-#### sqlx-cli
+## sqlx-cli
 
 sqlx-cli repository: [Github](https://github.com/launchbadge/sqlx/tree/master/sqlx-cli)
 
@@ -35,7 +30,7 @@ sqlx-cli repository: [Github](https://github.com/launchbadge/sqlx/tree/master/sq
 $ cargo install sqlx-cli --no-default-features --features postgres
 ```
 
-#### Migrations
+## Migrations
 
 To create a migration:
 
@@ -55,7 +50,7 @@ Revet migrations:
 $ sqlx migrate revert
 ```
 
-### Cargo watch
+# Cargo watch
 
 Usage:
 
@@ -63,7 +58,7 @@ Usage:
 $ cargo watch -x 'run --bin api'
 ```
 
-### Benchmark
+# Benchmark
 
 Use [Drill](https://github.com/fcsonline/drill)
 
@@ -71,7 +66,7 @@ Use [Drill](https://github.com/fcsonline/drill)
 $ drill --benchmark drill.yml --stats --quiet
 ```
 
-### Documentation
+# Documentation
 
 Run:
 
@@ -83,4 +78,16 @@ Run with private items:
 
 ```bash
 $ cargo doc --open --no-deps --document-private-items
+```
+
+# Build Docker image with CNCF Buildpacks
+
+```bash
+$ pack build vietnamdevsgroup/northwind-rs -e SQLX_OFFLINE=true -b paketocommunity/rust-builder
+```
+
+Un-comment section `northwindrs` in `docker-compose.yaml` file, then run:
+
+```bash
+$ docker-compose up
 ```
