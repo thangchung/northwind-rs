@@ -23,7 +23,7 @@ pub async fn login(
     match user {
         None => Err(AppError::Unauthorized {}),
         Some(user) => {
-            // Génération du token
+            // generate the token
             // -------------------
             let secret = &data.jwt_secret_key;
             let jwt_lifetime = data.jwt_lifetime;
@@ -76,8 +76,6 @@ pub async fn get_all(pool: web::Data<PgPool>) -> Result<impl Responder, AppError
     while let Some(row) = stream.try_next().await? {
         users.push(row?);
     }
-
-    let _: String = String::new();
 
     Ok(HttpResponse::Ok().json(users))
 }

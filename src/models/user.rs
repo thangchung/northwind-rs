@@ -107,22 +107,22 @@ pub struct UpdateUserModel {
 fn test_fullname() {
     let mut user = User {
         id: Uuid::new_v4(),
-        lastname: String::from("Bellanger"),
-        firstname: String::from("Fabien"),
+        lastname: String::from("Chung"),
+        firstname: String::from("Thang"),
         email: String::from(""),
         password: String::from(""),
         created_at: Utc::now().naive_utc(),
         updated_at: Utc::now().naive_utc(),
         deleted_at: None,
     };
-    assert_eq!("Fabien Bellanger", user._fullname());
+    assert_eq!("Thang Chung", user._fullname());
 
     user.firstname = String::from("");
-    assert_eq!("Bellanger", user._fullname());
+    assert_eq!("Thang", user._fullname());
 
-    user.firstname = String::from("Fabien");
+    user.firstname = String::from("Thang");
     user.lastname = String::from("");
-    assert_eq!("Fabien", user._fullname());
+    assert_eq!("Thang", user._fullname());
 
     user.firstname = String::from("");
     user.lastname = String::from("");

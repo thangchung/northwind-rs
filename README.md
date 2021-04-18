@@ -83,7 +83,7 @@ $ cargo doc --open --no-deps --document-private-items
 # Build Docker image with CNCF Buildpacks
 
 ```bash
-$ pack build vietnamdevsgroup/northwind-rs -e SQLX_OFFLINE=true -b paketocommunity/rust-builder
+$ pack build vietnamdevsgroup/northwind-rs -e SQLX_OFFLINE=true -b docker.io/paketocommunity/rust
 ```
 
 Un-comment section `northwindrs` in `docker-compose.yaml` file, then run:

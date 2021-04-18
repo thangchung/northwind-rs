@@ -19,35 +19,25 @@ path = "src/bin/api.rs"
 
 [dependencies]
 actix = "0.10"
-actix-cors = "0.3.0"
-actix-files = "0.5.0"
+actix-cors = "0.5.4"
 actix-http = "2"
 actix-service = "1.0.6"
 actix-web = "3"
-actix-web-actors = "3"
 actix-web-prom = "0.5"
 actix-web-validator = "2.0.3"
-askama_actix = "0.11.1"
-bytes = "0.5.6"
+validator = "0.12.0"
 chrono = {version = "0.4.19", features = ["serde"]}
+eyre = "0.6.3"
 color-eyre = "0.5.10"
 config = "0.11.0"
 derive_more = "0.99.11"
 dotenv = "0.15"
 env_logger = "0.8.3"
-eyre = "0.6.3"
 futures = "0.3"
 jsonwebtoken = "7.2.0"
 log = "0.4.11"
-rand = "0.8"
-reqwest ="0.11.3"
 serde = "1.0"
 serde_json = "1.0"
 sha2 = "0.9"
 sqlx = {version = "0.5.2", default-features = false, features = ["runtime-async-std-native-tls", "macros", "postgres", "uuid", "chrono", "migrate", "offline"]}
 uuid = {version = "0.8", features = ["serde", "v4"]}
-validator = "0.12.0"
-
-[dependencies.askama]
-features = ["with-actix-web", "serde-json"]
-version = "0.10"

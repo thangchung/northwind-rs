@@ -1,12 +1,11 @@
 pub mod config;
-mod errors;
 pub mod handlers;
+mod errors;
 mod logger;
-pub mod middlewares;
+mod middlewares;
 mod models;
 mod repositories;
 mod routes;
-mod ws;
 
 extern crate chrono;
 extern crate serde;
@@ -15,10 +14,7 @@ extern crate serde;
 extern crate log;
 
 use crate::config::Config;
-use crate::ws::chat::server;
-use actix::Actor;
 use actix_cors::Cors;
-use actix_files as fs;
 use actix_web::middleware::{errhandlers::ErrorHandlers, Logger};
 use actix_web::{http, App, HttpServer};
 use actix_web_prom::PrometheusMetrics;
@@ -47,17 +43,12 @@ pub async fn run(settings: Config, db_pool: Pool<Postgres>) -> Result<()> {
     // ----------
     let prometheus = PrometheusMetrics::new("api", Some("/metrics"), None);
 
-    // Start chat server actor
-    // -----------------------
-    let chat_server = server::ChatServer::new().start();
-
     // Start server
     // ------------
     HttpServer::new(move || {
         App::new()
             .data(db_pool.clone())
             .data(data.clone())
-            .data(chat_server.clone())
             .wrap(middlewares::request_id::RequestIdService)
             .wrap(middlewares::timer::Timer)
             .wrap(Logger::new("%s | %r | %Ts | %{User-Agent}i | %a | %{x-request-id}o"))
@@ -72,18 +63,16 @@ pub async fn run(settings: Config, db_pool: Pool<Postgres>) -> Result<()> {
                     .handler(http::StatusCode::GATEWAY_TIMEOUT, handlers::errors::render_504),
             )
             .wrap(
-                Cors::new()
+                Cors::default()
                     // .allowed_origin("*")
                     .allowed_methods(vec!["GET", "POST", "PATCH", "PUT", "DELETE", "HEAD", "OPTIONS"])
                     .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
                     .allowed_header(http::header::CONTENT_TYPE)
                     .supports_credentials()
-                    .max_age(3600)
-                    .finish(),
+                    .max_age(3600),
             )
             .configure(routes::web)
             .configure(routes::api)
-            .service(fs::Files::new("/assets", "./static"))
     })
     .bind(format!("{}:{}", settings.server_url, settings.server_port))?
     .run()
