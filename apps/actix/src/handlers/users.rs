@@ -1,9 +1,10 @@
 //! API users handlers module
 
+use northwind_domain::models::auth::Jwt;
+use northwind_domain::models::user::{Login, LoginResponse, User, UserCreation, UpdateUserModel};
+use northwind_infrastructure::repositories::user::UserRepository;
+
 use crate::errors::AppError;
-use crate::models::auth::Jwt;
-use crate::models::user::{Login, LoginResponse, User, UserCreation, UpdateUserModel};
-use crate::repositories::user::UserRepository;
 use crate::AppState;
 use actix_web::{http::StatusCode, web, HttpResponse, Responder};
 use actix_web_validator::Json;

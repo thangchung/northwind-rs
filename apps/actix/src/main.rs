@@ -1,5 +1,5 @@
-use northwind_rs::config::Config;
-use northwind_rs::run;
+use northwind_actix::config::Config;
+use northwind_actix::run;
 use color_eyre::Result;
 use sqlx::PgPool;
 
@@ -21,7 +21,7 @@ async fn main() -> Result<()> {
     // Runs migrations
     // ---------------
     if settings.database_auto_migration {
-        sqlx::migrate!("./migrations").run(&db_pool).await?;
+        sqlx::migrate!("./../../migrations").run(&db_pool).await?;
     }
 
     run(settings, db_pool).await

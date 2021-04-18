@@ -1,7 +1,8 @@
 //! Json Web Token middleware module
 
-use crate::models::auth;
-use crate::repositories::user::UserRepository;
+use northwind_domain::models::auth;
+use northwind_infrastructure::repositories::user::UserRepository;
+
 use crate::AppState;
 use actix_service::{Service, Transform};
 use actix_web::{

@@ -3,8 +3,6 @@ pub mod handlers;
 mod errors;
 mod logger;
 mod middlewares;
-mod models;
-mod repositories;
 mod routes;
 
 extern crate chrono;

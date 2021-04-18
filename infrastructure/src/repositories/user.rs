@@ -1,4 +1,4 @@
-use crate::models::user::{Login, User, UpdateUserModel};
+use northwind_domain::models::user::{Login, User, UpdateUserModel};
 use chrono::Utc;
 use futures::stream::BoxStream;
 use sha2::{Digest, Sha512};

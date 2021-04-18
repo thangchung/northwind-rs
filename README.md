@@ -14,7 +14,7 @@ If you're using this repository for your samples, workshop, your project or what
 
 ```bash
 $ docker-compose up
-$ cargo run --bin api
+$ cargo run --bin northwind-actix
 ```
 
 Then play around with `restclient.http`

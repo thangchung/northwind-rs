@@ -2,7 +2,6 @@
 
 use actix_web_validator::Validate;
 use serde::{Deserialize, Serialize};
-use sqlx::types::chrono::{Utc, NaiveDateTime};
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -13,10 +12,10 @@ pub struct User {
     pub email: String,
     #[serde(skip_serializing)]
     pub password: String,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
     #[serde(skip_serializing)]
-    pub deleted_at: Option<NaiveDateTime>,
+    pub deleted_at: Option<chrono::NaiveDateTime>,
 }
 
 impl User {
@@ -26,9 +25,9 @@ impl User {
         firstname: String,
         email: String,
         password: String,
-        created_at: NaiveDateTime,
-        updated_at: NaiveDateTime,
-        deleted_at: Option<NaiveDateTime>,
+        created_at: chrono::NaiveDateTime,
+        updated_at: chrono::NaiveDateTime,
+        deleted_at: Option<chrono::NaiveDateTime>,
     ) -> Self {
         Self {
             id,
@@ -49,8 +48,8 @@ impl User {
             firstname: user.firstname,
             email: user.email,
             password: user.password,
-            created_at: Utc::now().naive_utc(),
-            updated_at: Utc::now().naive_utc(),
+            created_at: chrono::Utc::now().naive_utc(),
+            updated_at: chrono::Utc::now().naive_utc(),
             deleted_at: None,
         }
     }
@@ -111,8 +110,8 @@ fn test_fullname() {
         firstname: String::from("Thang"),
         email: String::from(""),
         password: String::from(""),
-        created_at: Utc::now().naive_utc(),
-        updated_at: Utc::now().naive_utc(),
+        created_at: chrono::Utc::now().naive_utc(),
+        updated_at: chrono::Utc::now().naive_utc(),
         deleted_at: None,
     };
     assert_eq!("Thang Chung", user._fullname());
