@@ -2,46 +2,26 @@
 
 use actix_http::ResponseBuilder;
 use actix_web::{error::ResponseError, http::header, http::StatusCode, HttpResponse};
-use derive_more::{Display, Error};
-use serde::Serialize;
+use northwind_user::errors::{AppError, AppErrorMessage};
 
-/// Represents the custom error message
-#[derive(Serialize)]
-pub struct AppErrorMessage {
-    pub code: u16,
-    pub message: String,
-}
+#[derive(Debug)]
+pub struct ApiError(AppError);
 
-/// Defines available errors
-#[derive(Display, Debug, Error)]
-pub enum AppError {
-    #[display(fmt = "{}", message)]
-    InternalError { message: String },
-
-    #[display(fmt = "{}", message)]
-    BadRequest { message: String },
-
-    #[display(fmt = "{}", message)]
-    NotFound { message: String },
-
-    #[display(fmt = "Unauthorized")]
-    Unauthorized,
-}
-
-impl AppError {
-    pub fn name(&self) -> String {
-        match self {
-            Self::NotFound { message: m } => m.to_owned(),
-            Self::BadRequest { message: m } => m.to_owned(),
-            Self::InternalError { message: m } => m.to_owned(),
-            Self::Unauthorized => "Unauthorized".to_owned(),
-        }
+impl From<AppError> for ApiError {
+    fn from(error: AppError) -> Self {
+        ApiError(error)
     }
 }
 
-impl ResponseError for AppError {
+impl std::fmt::Display for ApiError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
-        match *self {
+        match self.0 {
             AppError::InternalError { .. } => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::BadRequest { .. } => StatusCode::BAD_REQUEST,
             AppError::NotFound { .. } => StatusCode::NOT_FOUND,
@@ -59,12 +39,12 @@ impl ResponseError for AppError {
     }
 }
 
-impl From<sqlx::Error> for AppError {
+impl From<sqlx::Error> for ApiError {
     fn from(error: sqlx::Error) -> Self {
         match error {
-            _ => Self::InternalError {
+            _ => AppError::InternalError {
                 message: "Database Error".to_owned(),
-            },
+            }.into(),
         }
     }
 }

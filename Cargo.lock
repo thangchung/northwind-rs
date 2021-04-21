@@ -1822,6 +1822,7 @@ dependencies = [
 name = "northwind-domain"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "chrono",
  "serde 1.0.125",
  "serde_json",
@@ -1833,8 +1834,10 @@ dependencies = [
 name = "northwind-user"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "chrono",
  "color-eyre",
+ "derive_more",
  "futures",
  "jsonwebtoken",
  "northwind-domain",

@@ -8,29 +8,29 @@ use futures::TryStreamExt;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use northwind_user::repositories::user::UserRepository;
-
-use northwind_user::services::jwt_service::Jwt;
+use crate::errors::ApiError;
 use northwind_domain::authn::models::user::{Login, LoginResponse, UpdateUserModel, User, UserCreation};
 use northwind_domain::authn::services::jwt_processor::JwtProcessor;
-use crate::errors::AppError;
+use northwind_user::errors::AppError;
+use northwind_user::repositories::user::UserRepository;
 
 // Route: POST "/v1/login"
 pub async fn login(
     pool: web::Data<PgPool>,
     data: web::Data<AppState>,
+    jwt_processor: web::Data<dyn JwtProcessor>,
     form: Json<Login>,
-) -> Result<impl Responder, AppError> {
+) -> Result<impl Responder, ApiError> {
     let user = UserRepository::login(pool.get_ref(), form.into_inner()).await?;
 
     match user {
-        None => Err(AppError::Unauthorized {}),
+        None => Err(AppError::Unauthorized {}.into()),
         Some(user) => {
             // generate the token
             // -------------------
             let secret = &data.jwt_secret_key;
             let jwt_lifetime = data.jwt_lifetime;
-            let token = Jwt::generate(
+            let token = jwt_processor.generate(
                 user.id.to_owned(),
                 user.lastname.to_owned(),
                 user.firstname.to_owned(),
@@ -53,14 +53,14 @@ pub async fn login(
                         expires_at: expires_at.to_rfc3339_opts(SecondsFormat::Secs, true),
                     }))
                 }
-                _ => Err(AppError::Unauthorized {}),
+                _ => Err(AppError::Unauthorized {}.into()),
             }
         }
     }
 }
 
 // Route: POST "/v1/register"
-pub async fn register(pool: web::Data<PgPool>, form: Json<UserCreation>) -> Result<impl Responder, AppError> {
+pub async fn register(pool: web::Data<PgPool>, form: Json<UserCreation>) -> Result<impl Responder, ApiError> {
     let mut user = User::new(form.0);
     let result = UserRepository::create(pool.get_ref(), &mut user).await;
 
@@ -68,12 +68,13 @@ pub async fn register(pool: web::Data<PgPool>, form: Json<UserCreation>) -> Resu
         Ok(_) => Ok(HttpResponse::Ok().json(user)),
         _ => Err(AppError::InternalError {
             message: String::from("Error during user creation"),
-        }),
+        }
+        .into()),
     }
 }
 
 // Route: GET "/v1/users"
-pub async fn get_all(pool: web::Data<PgPool>) -> Result<impl Responder, AppError> {
+pub async fn get_all(pool: web::Data<PgPool>) -> Result<impl Responder, ApiError> {
     let mut stream = UserRepository::get_all(pool.get_ref());
     let mut users: Vec<User> = Vec::new();
     while let Some(row) = stream.try_next().await? {
@@ -84,18 +85,19 @@ pub async fn get_all(pool: web::Data<PgPool>) -> Result<impl Responder, AppError
 }
 
 // Route: GET "/v1/users/{id}"
-pub async fn get_by_id(pool: web::Data<PgPool>, web::Path(id): web::Path<Uuid>) -> Result<impl Responder, AppError> {
+pub async fn get_by_id(pool: web::Data<PgPool>, web::Path(id): web::Path<Uuid>) -> Result<impl Responder, ApiError> {
     let user = UserRepository::get_by_id(pool.get_ref(), id).await?;
     match user {
         Some(user) => Ok(HttpResponse::Ok().json(user)),
         _ => Err(AppError::NotFound {
             message: String::from("No user found"),
-        }),
+        }
+        .into()),
     }
 }
 
 // Route: DELETE "/v1/users/{id}"
-pub async fn delete(pool: web::Data<PgPool>, web::Path(id): web::Path<Uuid>) -> Result<impl Responder, AppError> {
+pub async fn delete(pool: web::Data<PgPool>, web::Path(id): web::Path<Uuid>) -> Result<impl Responder, ApiError> {
     let result = UserRepository::delete(pool.get_ref(), id).await;
     match result {
         Ok(result) => {
@@ -104,12 +106,14 @@ pub async fn delete(pool: web::Data<PgPool>, web::Path(id): web::Path<Uuid>) -> 
             } else {
                 Err(AppError::InternalError {
                     message: String::from("No user or user already deleted"),
-                })
+                }
+                .into())
             }
         }
         _ => Err(AppError::InternalError {
             message: String::from("Error during user deletion"),
-        }),
+        }
+        .into()),
     }
 }
 
@@ -118,7 +122,7 @@ pub async fn update(
     pool: web::Data<PgPool>,
     web::Path(id): web::Path<Uuid>,
     form: Json<UpdateUserModel>,
-) -> Result<impl Responder, AppError> {
+) -> Result<impl Responder, ApiError> {
     UserRepository::update(pool.get_ref(), id.clone(), &form.0).await?;
 
     let user = UserRepository::get_by_id(pool.get_ref(), id).await?;
@@ -126,6 +130,19 @@ pub async fn update(
         Some(user) => Ok(HttpResponse::Ok().json(user)),
         _ => Err(AppError::NotFound {
             message: String::from("No user found"),
-        }),
+        }
+        .into()),
     }
+}
+
+pub fn init_routes(cfg: &mut web::ServiceConfig) {
+    cfg.route("/login", web::post().to(crate::handlers::users::login))
+        .route("/register", web::post().to(crate::handlers::users::register));
+}
+
+pub fn init_auth_routes(cfg: &mut web::ServiceConfig) {
+    cfg.route("", web::get().to(crate::handlers::users::get_all))
+        .route("/{id}", web::get().to(crate::handlers::users::get_by_id))
+        .route("/{id}", web::delete().to(crate::handlers::users::delete))
+        .route("/{id}", web::put().to(crate::handlers::users::update));
 }

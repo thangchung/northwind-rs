@@ -2,6 +2,7 @@ extern crate serde;
 
 pub mod repositories;
 pub mod services;
+pub mod errors;
 
 #[derive(Debug, Clone)]
 pub struct AppState {

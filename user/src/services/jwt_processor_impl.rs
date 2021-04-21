@@ -1,12 +1,15 @@
 use chrono::Utc;
 use color_eyre::Result;
 use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+use async_trait::async_trait;
 use northwind_domain::authn::{models::auth::Claims, services::jwt_processor::JwtProcessor};
 
-pub struct Jwt {}
+pub struct JwtProcessorImpl {}
 
-impl JwtProcessor for Jwt {
+#[async_trait]
+impl JwtProcessor for JwtProcessorImpl {
     fn generate(
+        &self,
         user_id: uuid::Uuid,
         user_lastname: String,
         user_firstname: String,
@@ -34,7 +37,7 @@ impl JwtProcessor for Jwt {
         Ok((token, expired_at))
     }
 
-    fn parse(token: String, secret_key: String) -> Result<Claims, Box<dyn std::error::Error>> {
+    fn parse(&self, token: String, secret_key: String) -> Result<Claims, Box<dyn std::error::Error>> {
         let validation = Validation::new(Algorithm::HS512);
         let token = decode::<Claims>(&token, &DecodingKey::from_secret(secret_key.as_bytes()), &validation)?;
 

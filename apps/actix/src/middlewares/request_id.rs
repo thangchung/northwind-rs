@@ -23,7 +23,7 @@ trait RequestIdMessage {
 ///
 /// ```rust
 /// use actix_web::*;
-/// use actix_sqlx_boilerplate::middlewares::request_id::RequestId;
+/// use northwind_actix::middlewares::request_id::RequestId;
 ///
 /// async fn index(request_id: RequestId) -> String {
 ///         format!("Request ID: {}", request_id.get())
@@ -76,7 +76,7 @@ impl FromRequest for RequestId {
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with
 //    next service in chain as parameter.
-// 2. Middleware's call method gets called with normal request.
+// 2. Middleware call method gets called with normal request.
 pub struct RequestIdService;
 
 // Middleware factory is `Transform` trait from actix-service crate

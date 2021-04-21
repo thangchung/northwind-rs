@@ -18,13 +18,15 @@ use std::task::{Context, Poll};
 use std::{cell::RefCell, pin::Pin, rc::Rc};
 use uuid::Uuid;
 
-use northwind_user::repositories::user::UserRepository;
-use northwind_user::services::jwt_service::Jwt;
 use crate::AppState;
+use northwind_user::repositories::user::UserRepository;
 use northwind_domain::authn::services::jwt_processor::JwtProcessor;
-use crate::errors::AppErrorMessage;
+use northwind_user::errors::AppErrorMessage;
+use std::sync::Arc;
 
-pub struct Authentication;
+pub struct Authentication {
+    pub jwt_processor: Arc<dyn JwtProcessor>,
+}
 
 impl<S: 'static, B> Transform<S> for Authentication
 where
@@ -42,12 +44,14 @@ where
     fn new_transform(&self, service: S) -> Self::Future {
         ok(AuthenticationMiddleware {
             service: Rc::new(RefCell::new(service)),
+            jwt_processor: self.jwt_processor.clone(),
         })
     }
 }
 
 pub struct AuthenticationMiddleware<S> {
     service: Rc<RefCell<S>>,
+    jwt_processor: Arc<dyn JwtProcessor>,
 }
 
 impl<S, B> Service for AuthenticationMiddleware<S>
@@ -68,6 +72,7 @@ where
 
     fn call(&mut self, req: ServiceRequest) -> Self::Future {
         let mut service_cloned = self.service.clone();
+        let jwt_processor = self.jwt_processor.clone();
         let mut is_authorized = false;
         let mut user_id = Uuid::new_v4();
 
@@ -86,7 +91,7 @@ where
 
             is_authorized = match token {
                 Some(token) => {
-                    let claims = Jwt::parse(token.to_owned(), secret_key.to_owned());
+                    let claims = jwt_processor.parse(token.to_owned(), secret_key.to_owned());
                     match claims {
                         Ok(claims) => {
                             user_id = claims.user_id;

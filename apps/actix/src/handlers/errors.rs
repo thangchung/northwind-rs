@@ -4,8 +4,8 @@ use actix_web::middleware::errhandlers::ErrorHandlerResponse;
 use actix_web::{body::Body, body::ResponseBody, dev, http};
 use actix_web::{error, http::StatusCode};
 use color_eyre::Result;
-use crate::errors::AppErrorMessage;
 use serde_json::json;
+use northwind_user::errors::AppErrorMessage;
 
 fn render_error<B>(mut res: dev::ServiceResponse<B>, code: u16, message: String) -> ErrorHandlerResponse<B> {
     let err = json!(AppErrorMessage { code, message });
