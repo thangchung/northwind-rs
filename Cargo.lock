@@ -1809,7 +1809,7 @@ dependencies = [
  "jsonwebtoken",
  "log",
  "northwind-domain",
- "northwind-infrastructure",
+ "northwind-user",
  "serde 1.0.125",
  "serde_json",
  "sha2",
@@ -1822,11 +1822,7 @@ dependencies = [
 name = "northwind-domain"
 version = "0.1.0"
 dependencies = [
- "actix-web-validator",
  "chrono",
- "color-eyre",
- "eyre",
- "jsonwebtoken",
  "serde 1.0.125",
  "serde_json",
  "uuid",
@@ -1834,15 +1830,20 @@ dependencies = [
 ]
 
 [[package]]
-name = "northwind-infrastructure"
+name = "northwind-user"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "color-eyre",
  "futures",
+ "jsonwebtoken",
  "northwind-domain",
+ "serde 1.0.125",
+ "serde_json",
  "sha2",
  "sqlx",
  "uuid",
+ "validator",
 ]
 
 [[package]]

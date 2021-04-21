@@ -37,4 +37,4 @@ sha2 = "0.9"
 sqlx = {version = "0.5.2", default-features = false, features = ["runtime-async-std-native-tls", "macros", "postgres", "uuid", "chrono", "migrate", "offline"]}
 uuid = {version = "0.8", features = ["serde", "v4"]}
 northwind-domain = { path = "../../domain", version = "0.1.0" }
-northwind-infrastructure = { path = "../../infrastructure", version = "0.1.0" }
+northwind-user = { path = "../../user", version = "0.1.0" }

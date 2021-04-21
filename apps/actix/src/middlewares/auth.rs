@@ -1,9 +1,5 @@
 //! Json Web Token middleware module
 
-use northwind_domain::models::auth;
-use northwind_infrastructure::repositories::user::UserRepository;
-
-use crate::AppState;
 use actix_service::{Service, Transform};
 use actix_web::{
     dev::{ServiceRequest, ServiceResponse},
@@ -18,9 +14,15 @@ use futures::{
     Future,
 };
 use sqlx::PgPool;
-use uuid::Uuid;
 use std::task::{Context, Poll};
 use std::{cell::RefCell, pin::Pin, rc::Rc};
+use uuid::Uuid;
+
+use northwind_user::repositories::user::UserRepository;
+use northwind_user::services::jwt_service::Jwt;
+use crate::AppState;
+use northwind_domain::authn::services::jwt_processor::JwtProcessor;
+use crate::errors::AppErrorMessage;
 
 pub struct Authentication;
 
@@ -84,7 +86,7 @@ where
 
             is_authorized = match token {
                 Some(token) => {
-                    let claims = auth::Jwt::parse(token.to_owned(), secret_key.to_owned());
+                    let claims = Jwt::parse(token.to_owned(), secret_key.to_owned());
                     match claims {
                         Ok(claims) => {
                             user_id = claims.user_id;
@@ -114,7 +116,7 @@ where
             } else {
                 Ok(req.into_response(
                     HttpResponse::Unauthorized()
-                        .json(crate::errors::AppErrorMessage {
+                        .json(AppErrorMessage {
                             code: StatusCode::UNAUTHORIZED.as_u16(),
                             message: "Unauthorized".to_owned(),
                         })

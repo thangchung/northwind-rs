@@ -1,17 +1,19 @@
 //! API users handlers module
 
-use northwind_domain::models::auth::Jwt;
-use northwind_domain::models::user::{Login, LoginResponse, User, UserCreation, UpdateUserModel};
-use northwind_infrastructure::repositories::user::UserRepository;
-
-use crate::errors::AppError;
 use crate::AppState;
 use actix_web::{http::StatusCode, web, HttpResponse, Responder};
 use actix_web_validator::Json;
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 use futures::TryStreamExt;
-use sqlx::{PgPool};
+use sqlx::PgPool;
 use uuid::Uuid;
+
+use northwind_user::repositories::user::UserRepository;
+
+use northwind_user::services::jwt_service::Jwt;
+use northwind_domain::authn::models::user::{Login, LoginResponse, UpdateUserModel, User, UserCreation};
+use northwind_domain::authn::services::jwt_processor::JwtProcessor;
+use crate::errors::AppError;
 
 // Route: POST "/v1/login"
 pub async fn login(
@@ -33,7 +35,7 @@ pub async fn login(
                 user.lastname.to_owned(),
                 user.firstname.to_owned(),
                 user.email.to_owned(),
-                secret.to_owned(),
+                String::from(secret.to_owned()),
                 jwt_lifetime,
             );
 
@@ -82,10 +84,7 @@ pub async fn get_all(pool: web::Data<PgPool>) -> Result<impl Responder, AppError
 }
 
 // Route: GET "/v1/users/{id}"
-pub async fn get_by_id(
-    pool: web::Data<PgPool>,
-    web::Path(id): web::Path<Uuid>,
-) -> Result<impl Responder, AppError> {
+pub async fn get_by_id(pool: web::Data<PgPool>, web::Path(id): web::Path<Uuid>) -> Result<impl Responder, AppError> {
     let user = UserRepository::get_by_id(pool.get_ref(), id).await?;
     match user {
         Some(user) => Ok(HttpResponse::Ok().json(user)),

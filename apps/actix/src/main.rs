@@ -1,6 +1,6 @@
+use color_eyre::Result;
 use northwind_actix::config::Config;
 use northwind_actix::run;
-use color_eyre::Result;
 use sqlx::PgPool;
 
 #[actix_web::main]

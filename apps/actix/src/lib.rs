@@ -1,29 +1,26 @@
+use actix_cors::Cors;
+use actix_web::{App, http, HttpServer};
+use actix_web::middleware::{errhandlers::ErrorHandlers, Logger};
+use actix_web_prom::PrometheusMetrics;
+use color_eyre::Result;
+use sqlx::{Pool, Postgres};
+
+use northwind_user::AppState;
+
+use crate::config::Config;
+
 pub mod config;
 pub mod handlers;
-mod errors;
 mod logger;
 mod middlewares;
 mod routes;
+pub mod errors;
 
 extern crate chrono;
 extern crate serde;
 
 #[macro_use]
 extern crate log;
-
-use crate::config::Config;
-use actix_cors::Cors;
-use actix_web::middleware::{errhandlers::ErrorHandlers, Logger};
-use actix_web::{http, App, HttpServer};
-use actix_web_prom::PrometheusMetrics;
-use color_eyre::Result;
-use sqlx::{Postgres, Pool};
-
-#[derive(Debug, Clone)]
-pub struct AppState {
-    pub jwt_secret_key: String,
-    pub jwt_lifetime: i64,
-}
 
 pub async fn run(settings: Config, db_pool: Pool<Postgres>) -> Result<()> {
     // Logger

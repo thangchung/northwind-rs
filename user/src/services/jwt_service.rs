@@ -1,29 +1,13 @@
-//! Json Web Token module
-
 use chrono::Utc;
 use color_eyre::Result;
 use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Claims {
-    pub sub: String,
-    pub exp: i64,
-    pub iat: i64,
-    pub nbf: i64,
-    pub user_id: Uuid,
-    pub user_lastname: String,
-    pub user_firstname: String,
-    pub user_email: String,
-}
+use northwind_domain::authn::{models::auth::Claims, services::jwt_processor::JwtProcessor};
 
 pub struct Jwt {}
 
-impl Jwt {
-    // Generate JWT
-    pub fn generate(
-        user_id: Uuid,
+impl JwtProcessor for Jwt {
+    fn generate(
+        user_id: uuid::Uuid,
         user_lastname: String,
         user_firstname: String,
         user_email: String,
@@ -50,8 +34,7 @@ impl Jwt {
         Ok((token, expired_at))
     }
 
-    // Parse JWT
-    pub fn parse(token: String, secret_key: String) -> Result<Claims, Box<dyn std::error::Error>> {
+    fn parse(token: String, secret_key: String) -> Result<Claims, Box<dyn std::error::Error>> {
         let validation = Validation::new(Algorithm::HS512);
         let token = decode::<Claims>(&token, &DecodingKey::from_secret(secret_key.as_bytes()), &validation)?;
 

@@ -1,6 +1,6 @@
 //! User model module
 
-use actix_web_validator::Validate;
+use validator::{Validate};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -99,7 +99,7 @@ pub struct UserCreation {
 #[derive(Serialize, Deserialize, Debug, Validate)]
 pub struct UpdateUserModel {
     pub lastname: String,
-    pub firstname: String
+    pub firstname: String,
 }
 
 #[test]

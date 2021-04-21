@@ -12,15 +12,15 @@ pub fn web(cfg: &mut web::ServiceConfig) {
 pub fn api(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/v1")
-            .route("/login", web::post().to(handlers::users::login))
-            .route("/register", web::post().to(handlers::users::register))
+            .route("/login", web::post().to(crate::handlers::users::login))
+            .route("/register", web::post().to(crate::handlers::users::register))
             .service(
                 web::scope("/users")
                     .wrap(crate::middlewares::auth::Authentication)
-                    .route("", web::get().to(handlers::users::get_all))
-                    .route("/{id}", web::get().to(handlers::users::get_by_id))
-                    .route("/{id}", web::delete().to(handlers::users::delete))
-                    .route("/{id}", web::put().to(handlers::users::update)),
+                    .route("", web::get().to(crate::handlers::users::get_all))
+                    .route("/{id}", web::get().to(crate::handlers::users::get_by_id))
+                    .route("/{id}", web::delete().to(crate::handlers::users::delete))
+                    .route("/{id}", web::put().to(crate::handlers::users::update)),
             ),
     );
 }

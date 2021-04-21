@@ -4,10 +4,11 @@ use actix_web::middleware::errhandlers::ErrorHandlerResponse;
 use actix_web::{body::Body, body::ResponseBody, dev, http};
 use actix_web::{error, http::StatusCode};
 use color_eyre::Result;
+use crate::errors::AppErrorMessage;
 use serde_json::json;
 
 fn render_error<B>(mut res: dev::ServiceResponse<B>, code: u16, message: String) -> ErrorHandlerResponse<B> {
-    let err = json!(crate::errors::AppErrorMessage { code, message });
+    let err = json!(AppErrorMessage { code, message });
 
     res.request();
     res.headers_mut().insert(

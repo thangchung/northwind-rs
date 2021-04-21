@@ -7,12 +7,8 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-actix-web-validator = "2.0.3"
 validator = "0.12.0"
 chrono = {version = "0.4.19", features = ["serde"]}
 serde = "1.0"
 serde_json = "1.0"
 uuid = {version = "0.8", features = ["serde", "v4"]}
-eyre = "0.6.3"
-color-eyre = "0.5.10"
-jsonwebtoken = "7.2.0"

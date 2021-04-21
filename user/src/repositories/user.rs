@@ -1,8 +1,8 @@
-use northwind_domain::models::user::{Login, User, UpdateUserModel};
 use chrono::Utc;
 use futures::stream::BoxStream;
+use northwind_domain::authn::models::user::{Login, UpdateUserModel, User};
 use sha2::{Digest, Sha512};
-use sqlx::postgres::{PgRow, PgQueryResult};
+use sqlx::postgres::{PgQueryResult, PgRow};
 use sqlx::{PgPool, Row};
 use uuid::Uuid;
 
