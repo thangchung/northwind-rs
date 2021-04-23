@@ -52,7 +52,6 @@ services:
   #     DATABASE_AUTO_MIGRATION: "true"
   #   ports:
   #     - 8089:8089
-  #   entrypoint: ["/layers/paketo-community_cargo-install/rust-bin/bin/api"]
   #   networks:
   #     - mynetwork
   #   restart: unless-stopped

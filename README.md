@@ -83,11 +83,18 @@ $ cargo doc --open --no-deps --document-private-items
 # Build Docker image with CNCF Buildpacks
 
 ```bash
-$ pack build vietnamdevsgroup/northwind-rs -e SQLX_OFFLINE=true -b docker.io/paketocommunity/rust
+$ pack build vietnamdevsgroup/northwind-rs -e SQLX_OFFLINE=true -e BP_CARGO_INSTALL_ARGS="--path=./apps/actix" 
+-b docker.io/paketocommunity/rust
 ```
 
 Un-comment section `northwindrs` in `docker-compose.yaml` file, then run:
 
 ```bash
 $ docker-compose up
+```
+
+Troubleshooting `vietnamdevsgroup/northwind-rs` docker image:
+
+```bash
+$ docker run -it --entrypoint /bin/bash vietnamdevsgroup/northwind-rs
 ```

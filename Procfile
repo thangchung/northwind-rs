@@ -1,1 +1,1 @@
-web: ./target/release/northwind-actix
+web: northwind-actix
