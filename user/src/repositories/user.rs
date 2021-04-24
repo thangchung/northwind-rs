@@ -1,16 +1,16 @@
+use crate::errors::AppError;
 use chrono::Utc;
-use futures::stream::BoxStream;
 use northwind_domain::authn::models::user::{Login, UpdateUserModel, User};
 use sha2::{Digest, Sha512};
-use sqlx::postgres::{PgQueryResult, PgRow};
-use sqlx::{PgPool, Row};
+use sqlx::postgres::{PgQueryResult};
+use sqlx::{PgPool};
 use uuid::Uuid;
 
 pub struct UserRepository;
 
 impl UserRepository {
     /// Returns a User if credentials are right
-    pub async fn login(pool: &PgPool, input: Login) -> Result<Option<User>, sqlx::Error> {
+    pub async fn login(pool: &PgPool, input: Login) -> Result<Option<User>, AppError> {
         let hashed_password = format!("{:x}", Sha512::digest(&input.password.as_bytes()));
         let result = sqlx::query!(
             r#"
@@ -24,7 +24,8 @@ impl UserRepository {
             hashed_password
         )
         .fetch_optional(pool)
-        .await?;
+        .await
+        .map_err(|e| -> AppError { e.into() })?;
 
         match result {
             Some(result) => Ok(Some(User::init(
@@ -42,7 +43,7 @@ impl UserRepository {
     }
 
     /// Add a new user
-    pub async fn create(pool: &PgPool, user: &mut User) -> Result<PgQueryResult, sqlx::Error> {
+    pub async fn create(pool: &PgPool, user: &mut User) -> Result<PgQueryResult, AppError> {
         user.password = format!("{:x}", Sha512::digest(&user.password.as_bytes()));
 
         sqlx::query!(
@@ -61,28 +62,19 @@ impl UserRepository {
         )
         .execute(pool)
         .await
+        .map_err(|e| -> AppError { e.into() })
     }
 
     /// Returns all users not deleted
-    pub fn get_all(pool: &PgPool) -> BoxStream<Result<Result<User, sqlx::Error>, sqlx::Error>> {
-        sqlx::query(r#"SELECT * FROM users WHERE deleted_at IS NULL"#)
-            .map(|row: PgRow| {
-                Ok(User {
-                    id: row.try_get(0)?,
-                    lastname: row.try_get(1)?,
-                    firstname: row.try_get(2)?,
-                    email: row.try_get(3)?,
-                    password: row.try_get(4)?,
-                    created_at: row.try_get(5)?,
-                    updated_at: row.try_get(6)?,
-                    deleted_at: row.try_get(7)?,
-                })
-            })
-            .fetch(pool)
+    pub async fn get_all(pool: &PgPool) -> Result<Vec<User>, AppError> {
+        sqlx::query_as!(User, r#"SELECT * FROM users WHERE deleted_at IS NULL"#)
+            .fetch_all(pool)
+            .await
+            .map_err(|e| -> AppError { e.into() })
     }
 
     /// Returns a user by its ID
-    pub async fn get_by_id(pool: &PgPool, id: Uuid) -> Result<Option<User>, sqlx::Error> {
+    pub async fn get_by_id(pool: &PgPool, id: Uuid) -> Result<Option<User>, AppError> {
         let result = sqlx::query!(
             r#"
                 SELECT * 
@@ -111,7 +103,7 @@ impl UserRepository {
     }
 
     /// Delete a user
-    pub async fn delete(pool: &PgPool, id: Uuid) -> Result<PgQueryResult, sqlx::Error> {
+    pub async fn delete(pool: &PgPool, id: Uuid) -> Result<PgQueryResult, AppError> {
         sqlx::query!(
             r#"
                 UPDATE users
@@ -123,10 +115,11 @@ impl UserRepository {
         )
         .execute(pool)
         .await
+        .map_err(|e| -> AppError { e.into() })
     }
 
     /// Update a user
-    pub async fn update(pool: &PgPool, id: Uuid, user: &UpdateUserModel) -> Result<PgQueryResult, sqlx::Error> {
+    pub async fn update(pool: &PgPool, id: Uuid, user: &UpdateUserModel) -> Result<PgQueryResult, AppError> {
         sqlx::query!(
             r#"
                 UPDATE users
@@ -140,5 +133,6 @@ impl UserRepository {
         )
         .execute(pool)
         .await
+        .map_err(|e| -> AppError { e.into() })
     }
 }

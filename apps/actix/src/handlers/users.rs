@@ -4,7 +4,6 @@ use crate::AppState;
 use actix_web::{http::StatusCode, web, HttpResponse, Responder};
 use actix_web_validator::Json;
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
-use futures::TryStreamExt;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -75,12 +74,7 @@ pub async fn register(pool: web::Data<PgPool>, form: Json<UserCreation>) -> Resu
 
 // Route: GET "/v1/users"
 pub async fn get_all(pool: web::Data<PgPool>) -> Result<impl Responder, ApiError> {
-    let mut stream = UserRepository::get_all(pool.get_ref());
-    let mut users: Vec<User> = Vec::new();
-    while let Some(row) = stream.try_next().await? {
-        users.push(row?);
-    }
-
+    let users = UserRepository::get_all(pool.get_ref()).await?;
     Ok(HttpResponse::Ok().json(users))
 }
 

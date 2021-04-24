@@ -30,6 +30,21 @@ sqlx-cli repository: [Github](https://github.com/launchbadge/sqlx/tree/master/sq
 $ cargo install sqlx-cli --no-default-features --features postgres
 ```
 
+### Offline mode
+
+On windows 10
+
+Make sure that you have `docker-compose up` running with at least `postgresdb`
+
+```bash
+$ cargo clean
+$ cmd /c "set SQLX_OFFLINE=true && cargo sqlx prepare -- --manifest-path apps/actix/Cargo.toml --bin northwind-actix"
+```
+
+Make sure, we have `sqlx-data.json` updated. Then, we can build the buildpack below
+
+The issue couldn't run `cargo sqlx` cli successfully at https://github.com/launchbadge/sqlx/issues/788
+
 ## Migrations
 
 To create a migration:
@@ -93,8 +108,17 @@ Un-comment section `northwindrs` in `docker-compose.yaml` file, then run:
 $ docker-compose up
 ```
 
-Troubleshooting `vietnamdevsgroup/northwind-rs` docker image:
+# Troubleshooting 
+
+## Inspect docker image
 
 ```bash
 $ docker run -it --entrypoint /bin/bash vietnamdevsgroup/northwind-rs
+```
+
+## Dive to see what inside docker image
+
+```bash
+$ docker pull wagoodman/dive:latest
+$ docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive:latest vietnamdevsgroup/northwind-rs
 ```
