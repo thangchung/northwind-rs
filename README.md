@@ -93,8 +93,17 @@ Un-comment section `northwindrs` in `docker-compose.yaml` file, then run:
 $ docker-compose up
 ```
 
-Troubleshooting `vietnamdevsgroup/northwind-rs` docker image:
+# Troubleshooting 
+
+## Inspect `vietnamdevsgroup/northwind-rs` docker image
 
 ```bash
 $ docker run -it --entrypoint /bin/bash vietnamdevsgroup/northwind-rs
+```
+
+## Dive to see what inside docker image
+
+```bash
+$ docker pull wagoodman/dive:latest
+$ docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive:latest vietnamdevsgroup/northwind-rs
 ```
