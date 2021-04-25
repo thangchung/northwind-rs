@@ -19,9 +19,9 @@ use std::{cell::RefCell, pin::Pin, rc::Rc};
 use uuid::Uuid;
 
 use crate::AppState;
-use northwind_user::repositories::user::UserRepository;
-use northwind_domain::authn::services::jwt_processor::JwtProcessor;
-use northwind_user::errors::AppErrorMessage;
+use northwind_user::repositories::user_repository_impl::UserRepositoryImpl;
+use northwind_user::domain::jwt_processor::JwtProcessor;
+use northwind_core::errors::AppErrorMessage;
 use std::sync::Arc;
 
 pub struct Authentication {
@@ -108,7 +108,7 @@ where
             if is_authorized {
                 // Check if user is still valid
                 is_authorized = match req.app_data::<Data<PgPool>>() {
-                    Some(pool) => match UserRepository::get_by_id(pool.get_ref(), user_id).await {
+                    Some(pool) => match UserRepositoryImpl::get_by_id(pool.get_ref(), user_id).await {
                         Ok(user) => user.is_some(),
                         _ => false,
                     },

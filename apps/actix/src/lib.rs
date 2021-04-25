@@ -7,9 +7,9 @@ use sqlx::{Pool, Postgres};
 use std::sync::Arc;
 
 use crate::config::Config;
-use northwind_domain::authn::services::jwt_processor::JwtProcessor;
 use northwind_user::services::jwt_processor_impl::JwtProcessorImpl;
 use northwind_user::AppState;
+use northwind_user::domain::jwt_processor::JwtProcessor;
 
 pub mod config;
 pub mod errors;

@@ -1,7 +1,6 @@
 use uuid::Uuid;
 use async_trait::async_trait;
-
-use crate::authn::models::auth::Claims;
+use crate::domain::auth::Claims;
 
 #[async_trait]
 pub trait JwtProcessor: Send + Sync {

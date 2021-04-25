@@ -2,7 +2,7 @@
 
 use actix_http::ResponseBuilder;
 use actix_web::{error::ResponseError, http::header, http::StatusCode, HttpResponse};
-use northwind_user::errors::{AppError, AppErrorMessage};
+use northwind_core::errors::{AppError, AppErrorMessage};
 
 #[derive(Debug)]
 pub struct ApiError(AppError);

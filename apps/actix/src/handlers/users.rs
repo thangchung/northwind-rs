@@ -8,10 +8,10 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::errors::ApiError;
-use northwind_domain::authn::models::user::{Login, LoginResponse, UpdateUserModel, User, UserCreation};
-use northwind_domain::authn::services::jwt_processor::JwtProcessor;
-use northwind_user::errors::AppError;
-use northwind_user::repositories::user::UserRepository;
+use northwind_user::domain::user::{Login, LoginResponse, UpdateUserModel, User, UserCreation};
+use northwind_user::domain::jwt_processor::JwtProcessor;
+use northwind_core::errors::AppError;
+use northwind_user::repositories::user_repository_impl::UserRepositoryImpl;
 
 // Route: POST "/v1/login"
 pub async fn login(
@@ -20,7 +20,7 @@ pub async fn login(
     jwt_processor: web::Data<dyn JwtProcessor>,
     form: Json<Login>,
 ) -> Result<impl Responder, ApiError> {
-    let user = UserRepository::login(pool.get_ref(), form.into_inner()).await?;
+    let user = UserRepositoryImpl::login(pool.get_ref(), form.into_inner()).await?;
 
     match user {
         None => Err(AppError::Unauthorized {}.into()),
@@ -61,7 +61,7 @@ pub async fn login(
 // Route: POST "/v1/register"
 pub async fn register(pool: web::Data<PgPool>, form: Json<UserCreation>) -> Result<impl Responder, ApiError> {
     let mut user = User::new(form.0);
-    let result = UserRepository::create(pool.get_ref(), &mut user).await;
+    let result = UserRepositoryImpl::create(pool.get_ref(), &mut user).await;
 
     match result {
         Ok(_) => Ok(HttpResponse::Ok().json(user)),
@@ -74,13 +74,13 @@ pub async fn register(pool: web::Data<PgPool>, form: Json<UserCreation>) -> Resu
 
 // Route: GET "/v1/users"
 pub async fn get_all(pool: web::Data<PgPool>) -> Result<impl Responder, ApiError> {
-    let users = UserRepository::get_all(pool.get_ref()).await?;
+    let users = UserRepositoryImpl::get_all(pool.get_ref()).await?;
     Ok(HttpResponse::Ok().json(users))
 }
 
 // Route: GET "/v1/users/{id}"
 pub async fn get_by_id(pool: web::Data<PgPool>, web::Path(id): web::Path<Uuid>) -> Result<impl Responder, ApiError> {
-    let user = UserRepository::get_by_id(pool.get_ref(), id).await?;
+    let user = UserRepositoryImpl::get_by_id(pool.get_ref(), id).await?;
     match user {
         Some(user) => Ok(HttpResponse::Ok().json(user)),
         _ => Err(AppError::NotFound {
@@ -92,16 +92,16 @@ pub async fn get_by_id(pool: web::Data<PgPool>, web::Path(id): web::Path<Uuid>) 
 
 // Route: DELETE "/v1/users/{id}"
 pub async fn delete(pool: web::Data<PgPool>, web::Path(id): web::Path<Uuid>) -> Result<impl Responder, ApiError> {
-    let result = UserRepository::delete(pool.get_ref(), id).await;
+    let result = UserRepositoryImpl::delete(pool.get_ref(), id).await;
     match result {
         Ok(result) => {
-            if result.rows_affected() == 1 {
+            if result.unwrap() == 1 {
                 Ok(HttpResponse::Ok().status(StatusCode::NO_CONTENT).finish())
             } else {
-                Err(AppError::InternalError {
-                    message: String::from("No user or user already deleted"),
-                }
-                .into())
+            Err(AppError::InternalError {
+            message: String::from("No user or user already deleted"),
+            }
+            .into())
             }
         }
         _ => Err(AppError::InternalError {
@@ -117,9 +117,9 @@ pub async fn update(
     web::Path(id): web::Path<Uuid>,
     form: Json<UpdateUserModel>,
 ) -> Result<impl Responder, ApiError> {
-    UserRepository::update(pool.get_ref(), id.clone(), &form.0).await?;
+    UserRepositoryImpl::update(pool.get_ref(), id.clone(), &form.0).await?;
 
-    let user = UserRepository::get_by_id(pool.get_ref(), id).await?;
+    let user = UserRepositoryImpl::get_by_id(pool.get_ref(), id).await?;
     match user {
         Some(user) => Ok(HttpResponse::Ok().json(user)),
         _ => Err(AppError::NotFound {

@@ -1,6 +1,6 @@
 [workspace]
 members = [
   "apps/actix",
-  "user",
-  "domain",
+  "components/core",
+  "components/user",
 ]
