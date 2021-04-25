@@ -4,23 +4,23 @@ use crate::AppState;
 use actix_web::{http::StatusCode, web, HttpResponse, Responder};
 use actix_web_validator::Json;
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
-use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::errors::ApiError;
 use northwind_user::domain::user::{Login, LoginResponse, UpdateUserModel, User, UserCreation};
 use northwind_user::domain::jwt_processor::JwtProcessor;
 use northwind_core::errors::AppError;
-use northwind_user::repositories::user_repository_impl::UserRepositoryImpl;
+use northwind_user::domain::user_repository::UserRepository;
 
 // Route: POST "/v1/login"
 pub async fn login(
-    pool: web::Data<PgPool>,
     data: web::Data<AppState>,
     jwt_processor: web::Data<dyn JwtProcessor>,
+    user_repo: web::Data<dyn UserRepository>,
     form: Json<Login>,
 ) -> Result<impl Responder, ApiError> {
-    let user = UserRepositoryImpl::login(pool.get_ref(), form.into_inner()).await?;
+    let model = form.into_inner();
+    let user = user_repo.login(model.email, model.password).await?;
 
     match user {
         None => Err(AppError::Unauthorized {}.into()),
@@ -59,9 +59,9 @@ pub async fn login(
 }
 
 // Route: POST "/v1/register"
-pub async fn register(pool: web::Data<PgPool>, form: Json<UserCreation>) -> Result<impl Responder, ApiError> {
+pub async fn register(user_repo: web::Data<dyn UserRepository>, form: Json<UserCreation>) -> Result<impl Responder, ApiError> {
     let mut user = User::new(form.0);
-    let result = UserRepositoryImpl::create(pool.get_ref(), &mut user).await;
+    let result = user_repo.create(&mut user).await;
 
     match result {
         Ok(_) => Ok(HttpResponse::Ok().json(user)),
@@ -73,14 +73,14 @@ pub async fn register(pool: web::Data<PgPool>, form: Json<UserCreation>) -> Resu
 }
 
 // Route: GET "/v1/users"
-pub async fn get_all(pool: web::Data<PgPool>) -> Result<impl Responder, ApiError> {
-    let users = UserRepositoryImpl::get_all(pool.get_ref()).await?;
+pub async fn get_all(user_repo: web::Data<dyn UserRepository>) -> Result<impl Responder, ApiError> {
+    let users = user_repo.get_all().await?;
     Ok(HttpResponse::Ok().json(users))
 }
 
 // Route: GET "/v1/users/{id}"
-pub async fn get_by_id(pool: web::Data<PgPool>, web::Path(id): web::Path<Uuid>) -> Result<impl Responder, ApiError> {
-    let user = UserRepositoryImpl::get_by_id(pool.get_ref(), id).await?;
+pub async fn get_by_id(user_repo: web::Data<dyn UserRepository>, web::Path(id): web::Path<Uuid>) -> Result<impl Responder, ApiError> {
+    let user = user_repo.get_by_id(id).await?;
     match user {
         Some(user) => Ok(HttpResponse::Ok().json(user)),
         _ => Err(AppError::NotFound {
@@ -91,8 +91,8 @@ pub async fn get_by_id(pool: web::Data<PgPool>, web::Path(id): web::Path<Uuid>) 
 }
 
 // Route: DELETE "/v1/users/{id}"
-pub async fn delete(pool: web::Data<PgPool>, web::Path(id): web::Path<Uuid>) -> Result<impl Responder, ApiError> {
-    let result = UserRepositoryImpl::delete(pool.get_ref(), id).await;
+pub async fn delete(user_repo: web::Data<dyn UserRepository>, web::Path(id): web::Path<Uuid>) -> Result<impl Responder, ApiError> {
+    let result = user_repo.delete(id).await;
     match result {
         Ok(result) => {
             if result.unwrap() == 1 {
@@ -113,13 +113,14 @@ pub async fn delete(pool: web::Data<PgPool>, web::Path(id): web::Path<Uuid>) -> 
 
 // Route: PUT "/v1/users/{id}"
 pub async fn update(
-    pool: web::Data<PgPool>,
+    user_repo: web::Data<dyn UserRepository>,
     web::Path(id): web::Path<Uuid>,
     form: Json<UpdateUserModel>,
 ) -> Result<impl Responder, ApiError> {
-    UserRepositoryImpl::update(pool.get_ref(), id.clone(), &form.0).await?;
+    let model = &form.0;
+    user_repo.update(id.clone(), model.firstname.clone(), model.lastname.clone()).await?;
 
-    let user = UserRepositoryImpl::get_by_id(pool.get_ref(), id).await?;
+    let user = user_repo.get_by_id(id).await?;
     match user {
         Some(user) => Ok(HttpResponse::Ok().json(user)),
         _ => Err(AppError::NotFound {

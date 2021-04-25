@@ -10,6 +10,8 @@ use crate::config::Config;
 use northwind_user::services::jwt_processor_impl::JwtProcessorImpl;
 use northwind_user::AppState;
 use northwind_user::domain::jwt_processor::JwtProcessor;
+use northwind_user::domain::user_repository::UserRepository;
+use northwind_user::repositories::user_repository_impl::UserRepositoryImpl;
 
 pub mod config;
 pub mod errors;
@@ -30,8 +32,14 @@ pub async fn run(settings: Config, db_pool: Pool<Postgres>) -> Result<()> {
 
     // Init application state
     // ----------------------
+    let a_db_pool = Arc::new(db_pool.clone());
+
     let jwt_processor: Arc<dyn JwtProcessor> = Arc::new(JwtProcessorImpl {});
     let jwt_processor_data = web::Data::from(jwt_processor.clone());
+
+    let user_repo: Arc<dyn UserRepository> = Arc::new(UserRepositoryImpl{pool: a_db_pool.clone()});
+    let user_repo_data = web::Data::from(user_repo.clone());
+
     let data = AppState {
         jwt_secret_key: settings.jwt_secret_key.clone(),
         jwt_lifetime: settings.jwt_lifetime,
@@ -48,12 +56,14 @@ pub async fn run(settings: Config, db_pool: Pool<Postgres>) -> Result<()> {
         // -----------
         let auth_middleware = crate::middlewares::auth::Authentication {
             jwt_processor: jwt_processor.clone(),
+            user_repo: user_repo.clone(),
         };
 
         App::new()
             .data(db_pool.clone())
             .data(data.clone())
             .app_data(jwt_processor_data.clone())
+            .app_data(user_repo_data.clone())
             .wrap(middlewares::request_id::RequestIdService)
             .wrap(middlewares::timer::Timer)
             .wrap(Logger::new("%s | %r | %Ts | %{User-Agent}i | %a | %{x-request-id}o"))

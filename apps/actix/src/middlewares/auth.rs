@@ -19,13 +19,15 @@ use std::{cell::RefCell, pin::Pin, rc::Rc};
 use uuid::Uuid;
 
 use crate::AppState;
-use northwind_user::repositories::user_repository_impl::UserRepositoryImpl;
+use northwind_user::domain::user_repository::UserRepository;
 use northwind_user::domain::jwt_processor::JwtProcessor;
 use northwind_core::errors::AppErrorMessage;
 use std::sync::Arc;
 
+
 pub struct Authentication {
     pub jwt_processor: Arc<dyn JwtProcessor>,
+    pub user_repo: Arc<dyn UserRepository>,
 }
 
 impl<S: 'static, B> Transform<S> for Authentication
@@ -45,6 +47,7 @@ where
         ok(AuthenticationMiddleware {
             service: Rc::new(RefCell::new(service)),
             jwt_processor: self.jwt_processor.clone(),
+            user_repo: self.user_repo.clone(),
         })
     }
 }
@@ -52,6 +55,7 @@ where
 pub struct AuthenticationMiddleware<S> {
     service: Rc<RefCell<S>>,
     jwt_processor: Arc<dyn JwtProcessor>,
+    user_repo: Arc<dyn UserRepository>,
 }
 
 impl<S, B> Service for AuthenticationMiddleware<S>
@@ -73,6 +77,7 @@ where
     fn call(&mut self, req: ServiceRequest) -> Self::Future {
         let mut service_cloned = self.service.clone();
         let jwt_processor = self.jwt_processor.clone();
+        let user_repo = self.user_repo.clone();
         let mut is_authorized = false;
         let mut user_id = Uuid::new_v4();
 
@@ -108,7 +113,7 @@ where
             if is_authorized {
                 // Check if user is still valid
                 is_authorized = match req.app_data::<Data<PgPool>>() {
-                    Some(pool) => match UserRepositoryImpl::get_by_id(pool.get_ref(), user_id).await {
+                    Some(_) => match user_repo.get_by_id(user_id).await {
                         Ok(user) => user.is_some(),
                         _ => false,
                     },
